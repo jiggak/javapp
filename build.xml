@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="javapp" default="build">
+    <path id="build.classpath">
+        <fileset dir="deps/jython/" includes="*.jar" />
+        <fileset dir="${ant.library.dir}" includes="*.jar" />
+    </path>
+    
+    <path id="runtime.classpath">
+        <fileset dir="deps/jython/" includes="*.jar" />
+        <fileset file="javapp.jar" />
+    </path>
+    
+    <target name="build">
+        <mkdir dir="build" />
+        
+        <copy todir="build">
+            <fileset dir="deps/jython">
+                <include name="Lib/*.py" />
+            </fileset>
+        </copy>
+        
+        <copy todir="build/Lib">
+            <fileset dir="src/python">
+                <include name="*.py" />
+            </fileset>
+            <fileset dir="deps/plex">
+                <include name="Plex/*.py" />
+            </fileset>
+        </copy>
+        
+        <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
+
+        <jar destfile="javapp.jar">
+            <fileset dir="build" />
+            <fileset file="javapp-defs.xml" />
+        </jar>
+    </target>
+
+    <target name="clean">
+        <delete dir="javapp.jar" />
+        <delete dir="build" />
+    </target>
+
+    <target name="run" depends="build">
+        <taskdef resource="javapp-defs.xml" classpathref="runtime.classpath" />
+        <javapp srcfile="test/input.java" destfile="test/output.java">
+        	<property name="ppp" value="This is pee" />
+        </javapp>
+    </target>
+    
+</project>

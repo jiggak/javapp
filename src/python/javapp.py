@@ -62,7 +62,7 @@ class stack(list):
 class PpScanner(Scanner):
 
     def if_cond(self, text):
-        self.cond_stack.append(CondState(eval(self.expand_cond(text))))
+        self.cond_stack.push(CondState(eval(self.expand_cond(text))))
         return ""
 
     def elif_cond(self, text):
@@ -91,7 +91,12 @@ class PpScanner(Scanner):
         return text
 
     def expand_var(self, text):
-        return self.output(self.env[text])
+        if self.cond_stack.isempty():
+            return self.env[text]
+        elif self.cond_stack.peek() == True:
+            return self.output(self.env[text])
+        else:
+            return ""
 
     def output(self, text):
         if self.cond_stack.isempty():

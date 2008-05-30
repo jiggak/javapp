@@ -29,12 +29,13 @@ import java.util.Properties;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyFile;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 public class JavaPp {
    private PythonInterpreter py;
    
-   public JavaPp(String prefix, Hashtable env) {
+   public JavaPp(String prefix, Hashtable<Object, Object> env) {
       Properties props = new Properties();
       props.setProperty("python.home", "javapp.jar");
       props.setProperty("python.cachedir.skip", "true");
@@ -46,7 +47,8 @@ public class JavaPp {
       
       py.set("prefix", prefix);
       
-      Hashtable table = new Hashtable();
+      // jython requires dict's to contain only PyObjects in key and value
+      Hashtable<PyObject, PyObject> table = new Hashtable<PyObject, PyObject>();
       for (Object key : env.keySet()) {
          table.put(Py.java2py(key), Py.java2py(env.get(key)));
       }

@@ -100,9 +100,13 @@ public class JavaPpTask extends Task {
             throw new BuildException("srcfile or resource collection must be given");
          }
          
-         // srcfile is set, verify destfile is set too
-         if ( destFile == null ) {
+         // srcfile is set, verify dest file or dest dir is set
+         if ( destFile == null && destDir == null ) {
             throw new BuildException("destfile required when srcfile is given");
+         }
+         
+         if ( destDir != null ) {
+            destFile = new File(destDir, srcFile.getName());
          }
       } else {
          if ( srcFile != null ) {
@@ -139,6 +143,12 @@ public class JavaPpTask extends Task {
       
       JavaPp pp = new JavaPp(prefix, env);
       
+      if ( destDir != null && !destDir.exists() ) {
+         if ( ! destDir.mkdirs() ) {
+            throw new BuildException("unable to create destination directory");
+         }
+      }
+      
       if ( srcFile != null ) {
          try {
             pp.process(srcFile, destFile);
@@ -148,7 +158,15 @@ public class JavaPpTask extends Task {
       } else {
          for (FileSet fs : resources) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-            String[] includedFiles = ds.getIncludedFiles();
+            File baseDir = ds.getBasedir();
+            
+            for (String file : ds.getIncludedFiles()) {
+               try {
+                  pp.process(new File(baseDir, file), new File(destDir, file));
+               } catch (IOException e) {
+                  throw new BuildException(e);
+               }
+            }
          }
       }
    }

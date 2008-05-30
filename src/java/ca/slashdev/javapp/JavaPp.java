@@ -45,7 +45,8 @@ public class JavaPp {
       py = new PythonInterpreter();
       py.exec("from javapp import process");
       
-      py.set("prefix", prefix);
+      if ( prefix != null )
+         py.set("PREFIX", prefix);
       
       // jython requires dict's to contain only PyObjects in key and value
       Hashtable<PyObject, PyObject> table = new Hashtable<PyObject, PyObject>();

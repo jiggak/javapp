@@ -21,6 +21,8 @@ import re
 from StringIO import StringIO
 from Plex import *
 
+PREFIX = "#"
+
 class CondState:
     def __init__(self, result):
         self.result = result
@@ -74,7 +76,7 @@ class PpScanner(Scanner):
         return ""
 
     def end_cond(self, text):
-        return str(self.cond_stack.pop())
+        return self.output(str(self.cond_stack.pop()))
 
     def def_var(self, text):
         tokens = text.split(None, 1)
@@ -112,7 +114,6 @@ class PpScanner(Scanner):
     comp_op  = Str("==") | Str("!=") | Str(">") | Str("<") | Str(">=") | Str("<=")
     logic_op = Str("or") | Str("and")
 
-    prefix = Str("#")
     zspace = Rep(Any(" \t"))
     space  = Rep1(Any(" \t"))
 
@@ -136,21 +137,21 @@ class PpScanner(Scanner):
             (ident,    expand_var),
             (Str("}"), Begin(''))
         ]),
-        (prefix + Str("if"), Begin('ifcond')),
+        (Str(PREFIX) + Str("if"), Begin('ifcond')),
         State('ifcond', [
             (space,  IGNORE),
             (cond,   if_cond),
             (Eol,    Begin(''))
         ]),
-        (prefix + Str("elif"), Begin('elifcond')),
+        (Str(PREFIX) + Str("elif"), Begin('elifcond')),
         State('elifcond', [
             (space,  IGNORE),
             (cond,   elif_cond),
             (Eol,    Begin(''))
         ]),
-        (prefix + Str("else"), else_cond),
-        (prefix + Str("endif"), end_cond),
-        (prefix + Str("define"), Begin('defvar')),
+        (Str(PREFIX) + Str("else"), else_cond),
+        (Str(PREFIX) + Str("endif"), end_cond),
+        (Str(PREFIX) + Str("define"), Begin('defvar')),
         State('defvar', [
             (space, IGNORE),
             (ident + Opt(space + Rep(AnyBut("\n"))), def_var),
@@ -163,10 +164,11 @@ class PpScanner(Scanner):
         Scanner.__init__(self, self.lexicon, file)
         self.env = env
         self.cond_stack = stack()
-        self.begin("")
 
 def process(input, output, env = {}):
     scanner = PpScanner(input, env)
+    scanner.begin('')
+
     while 1:
         token, text = scanner.read()
         if token is None:
@@ -176,3 +178,4 @@ def process(input, output, env = {}):
 #if __name__ == '__main__':
 #    import sys
 #    process(sys.stdin, sys.stdout, {'poo': 'this is poo', 'pee': 'this is pee'})
+

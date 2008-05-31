@@ -1,34 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javapp" default="build">
+	<property name="jython.jar" location="deps/jython/jython.jar" />
+	
     <path id="build.classpath">
-        <fileset dir="deps/jython/" includes="*.jar" />
+        <pathelement location="${jython.jar}" />
         <fileset dir="${ant.library.dir}" includes="*.jar" />
     </path>
     
     <path id="runtime.classpath">
-        <fileset dir="deps/jython/" includes="*.jar" />
         <fileset file="javapp.jar" />
     </path>
     
     <target name="build">
         <mkdir dir="build" />
         
-        <copy todir="build">
-            <fileset dir="deps/jython">
-                <include name="Lib/*.py" />
-            </fileset>
-        </copy>
-        
         <copy todir="build/Lib">
-            <fileset dir="src/python">
-                <include name="*.py" />
-            </fileset>
-            <fileset dir="deps/plex">
-                <include name="Plex/*.py" />
-            </fileset>
+        	<fileset dir="deps/jython/Lib" includes="*.py" />
+            <fileset dir="src/python" includes="*.py" />
+            <fileset dir="deps/plex" includes="*.py" />
         </copy>
         
         <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
+
+    	<unjar src="${jython.jar}" dest="build" />
 
         <jar destfile="javapp.jar">
             <fileset dir="build" />

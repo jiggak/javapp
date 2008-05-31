@@ -17,7 +17,7 @@
         <copy todir="build/Lib">
         	<fileset dir="deps/jython/Lib" includes="*.py" />
             <fileset dir="src/python" includes="*.py" />
-            <fileset dir="deps/plex" includes="*.py" />
+            <fileset dir="deps/plex" includes="Plex/*.py" />
         </copy>
         
         <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
@@ -40,6 +40,7 @@
         <javapp destdir="test/output">
             <fileset dir="test/input" />
         	<property name="pee" value="poo" />
+        	<property name="num" value="2" />
         </javapp>
     </target>
     

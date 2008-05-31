@@ -86,7 +86,7 @@ class PpScanner(Scanner):
 
     def expand_cond(self, text):
         text = self.var_re.sub('self.env["\\1"]', text)
-        text = self.ndef_re.sub('self.env.has_key("\\1") == False', text)
+        text = self.ndef_re.sub('not self.env.has_key("\\1")', text)
         text = self.def_re.sub('self.env.has_key("\\1")', text)
         return text
 

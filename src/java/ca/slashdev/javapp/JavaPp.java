@@ -45,10 +45,29 @@ public class JavaPp {
       py = new PythonInterpreter();
       py.exec("from javapp import process");
       
-      // jython requires dict's to contain only PyObjects in key and value
       Hashtable<PyObject, PyObject> table = new Hashtable<PyObject, PyObject>();
+      PyObject pkey, pval;
+      String val;
+      
+      // jython requires dict's to contain only PyObjects in key and value
       for (Object key : env.keySet()) {
-         table.put(Py.java2py(key), Py.java2py(env.get(key)));
+         pkey = Py.java2py(key);
+         val = env.get(key).toString();
+         
+         try {
+            // first attempt to parse number as integer
+            pval = Py.java2py(Integer.parseInt(val));
+         } catch (NumberFormatException ie) {
+            try {
+               // if not integer, try double
+               pval = Py.java2py(Double.parseDouble(val));
+            } catch (NumberFormatException de) {
+               // if neither integer or double, let jython decide
+               pval = Py.java2py(val);
+            }
+         }
+         
+         table.put(pkey, pval);
       }
       
       py.set("env", new PyDictionary(table));

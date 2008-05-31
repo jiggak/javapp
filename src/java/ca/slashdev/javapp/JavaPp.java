@@ -45,9 +45,6 @@ public class JavaPp {
       py = new PythonInterpreter();
       py.exec("from javapp import process");
       
-      if ( prefix != null )
-         py.set("PREFIX", prefix);
-      
       // jython requires dict's to contain only PyObjects in key and value
       Hashtable<PyObject, PyObject> table = new Hashtable<PyObject, PyObject>();
       for (Object key : env.keySet()) {
@@ -55,6 +52,7 @@ public class JavaPp {
       }
       
       py.set("env", new PyDictionary(table));
+      py.set("prefix", prefix);
    }
    
    public void process(File input, File output) throws IOException {
@@ -68,7 +66,7 @@ public class JavaPp {
          py.set("infile", new PyFile(in));
          py.set("outfile", new PyFile(out));
          
-         py.exec("process(infile, outfile, env)");
+         py.exec("process(infile, outfile, env, prefix)");
       } finally {
          if ( in != null ) in.close();
          if ( out != null ) out.close();

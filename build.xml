@@ -43,7 +43,7 @@
 
     <target name="run" depends="build">
         <taskdef resource="javapp-defs.xml" classpathref="runtime.classpath" />
-        <javapp destdir="test/output" prefix="//#">
+        <javapp destdir="test/output">
             <fileset dir="test/input" />
         	<property name="pee" value="poo" />
         </javapp>

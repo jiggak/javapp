@@ -96,7 +96,7 @@ class PpScanner(Scanner):
 
     def expand_var(self, text):
         if self.cond_stack.isempty():
-            return self.env[text]
+            return str(self.env[text])
         elif self.cond_stack.peek() == True:
             return self.output(self.env[text])
         else:
@@ -125,7 +125,7 @@ class PpScanner(Scanner):
         hexdigit = Range("09AFaf")
 
         ident  = letter + Rep(letter | digit)
-        number = Rep1(digit) | (Str("0x") + Rep1(hexdigit))
+        number = Rep1(digit) | (Str("0x") + Rep1(hexdigit)) | Rep1(digit) + Str(".") + Rep1(digit)
         strlit = Str('"') + Rep(AnyBut('"')) + Str('"')
 
         var     = Str("${") + ident + Str("}")

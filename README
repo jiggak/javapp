@@ -75,6 +75,7 @@ destfile   - output file, only allowed when srcfile is set
 destdir    - destination directory, required for nested source filesets
 prefix     - change the macro prefix, default is '#'
 inheritall - inherit all properties from the project, default is true
+verbose    - show verbose output, default is false
 
 Elements
 -----------------
@@ -86,5 +87,7 @@ Elements
  ToDo
 ================================
 On the list of things to do is:
+ * friendlier error reporting
+ * show line number for undefined properties
  * the #include directive
  * custom macros written in python

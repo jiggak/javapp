@@ -30,11 +30,14 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.util.FileUtils;
 
 public class JavaPpTask extends Task {
    private String prefix = "#";
    
    private boolean inheritAll = true;
+   
+   private boolean verbose = false;
    
    private File destDir;
    
@@ -60,6 +63,14 @@ public class JavaPpTask extends Task {
    
    public void setInheritAll(boolean inheritAll) {
       this.inheritAll = inheritAll;
+   }
+   
+   public boolean isVerbose() {
+      return verbose;
+   }
+   
+   public void setVerbose(boolean verbose) {
+      this.verbose = verbose;
    }
    
    public void setDestDir(File destDir) {
@@ -157,6 +168,9 @@ public class JavaPpTask extends Task {
             }
          }
          
+         if ( verbose )
+            log(String.format("processing %s", srcFile.getName()));
+         
          try {
             pp.process(srcFile, destFile);
          } catch (IOException e) {
@@ -168,6 +182,7 @@ public class JavaPpTask extends Task {
             File baseDir = ds.getBasedir(), src, dest, parent;
             
             for (String file : ds.getIncludedFiles()) {
+               
                try {
                   src = new File(baseDir, file);
                   dest = new File(destDir, file);
@@ -176,6 +191,18 @@ public class JavaPpTask extends Task {
                   if ( !parent.exists() ) {
                      if ( !parent.mkdirs() ) {
                         throw new BuildException("unable to create parent directory of destination file");
+                     }
+                  }
+                  
+                  if ( verbose )
+                     log(String.format("processing %s", file));
+                  
+                  if ( dest.exists() ) {
+                     if ( FileUtils.getFileUtils().isUpToDate(src, dest) ) {
+                        if ( verbose )
+                           log("destination file is uptodate, processing skipped");
+                        
+                        continue;
                      }
                   }
                   

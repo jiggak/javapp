@@ -1,6 +1,7 @@
 <project name="javapp dependencies" default="extract">
 	<target name="extract">
 		<unzip dest="jython" src="jython_installer-2.2.1.jar" />
+	    <unjar dest="jython.jar" src="jython/jython.jar" />
 		<unzip dest="plex"   src="plex-1.1.5.zip" />
 	</target>
 	

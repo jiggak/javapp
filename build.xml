@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javapp" default="build">
     <property name="jython.jar" location="deps/jython/jython.jar" />
-    <property name="version" value="0.2" />
+    <property name="version" value="0.3" />
 
     <path id="build.classpath">
         <pathelement location="${jython.jar}" />
@@ -17,14 +17,16 @@
 
         <copy todir="build/Lib">
             <fileset dir="deps/jython/Lib" includes="*.py" />
-            <fileset dir="src/python" includes="*.py" />
             <fileset dir="deps/plex" includes="Plex/*.py" />
+            <fileset dir="src/python" includes="*.py" />
+        </copy>
+        
+        <copy todir="build">
+            <fileset dir="deps/jython.jar" />
         </copy>
 
         <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
-
-        <unjar src="${jython.jar}" dest="build" />
-
+        
         <jar destfile="javapp.jar">
             <fileset dir="build" />
             <fileset file="javapp-defs.xml" />
@@ -34,6 +36,7 @@
     <target name="clean">
         <delete dir="javapp.jar" />
         <delete dir="build" />
+        <delete dir="test/output" />
     </target>
 
     <target name="install" depends="build">
@@ -52,10 +55,10 @@
     
     <target name="test" depends="build">
         <taskdef resource="javapp-defs.xml" classpathref="runtime.classpath" />
-        <javapp destdir="test/output">
+        <javapp destdir="test/output" verbose="true">
             <fileset dir="test/input" />
             <property name="pee" value="poo" />
-            <property name="num" value="2" />
+            <property name="num" value="9999" />
         </javapp>
     </target>
 

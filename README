@@ -1,4 +1,40 @@
- javapp
-========
+JavaPP is a macro processor that runs in the Java VM and resembles the
+C preprocessor in syntax and functionality.  The core text processing is
+implemented in python and jython is used for running in the Java VM.
+
+
+ Grammar
+================================
+
+
+
+ Ant task
+================================
+To use the ant task, put the javapp.jar file where ant can find it
+(eg: ANT_HOME/lib) and add the taskdef to your build script:
+
+<taskdef resource="javapp-defs.xml" />
+
+Or put javapp.jar into your project and specify the classpath in the taskdef:
+
+<taskdef resource="javapp-def.xml" classpath="javapp.jar" />
 
 Attributes
+-----------------
+
+srcfile    - input file, either srcfile or nested fileset is required
+destfile   - output file, only allowed when srcfile is set
+destdir    - destination directory, required for nested source filesets
+prefix     - change the macro prefix, default is '#'
+inheritall - inherit all properties from the project, default is true
+
+Elements
+-----------------
+
+<property> - append key/value pairs to the processors environment
+<fileset>  - zero or more filesets of source files
+
+
+ ToDo
+================================
+

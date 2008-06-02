@@ -173,13 +173,16 @@ public class JavaPpTask extends Task {
          
          try {
             pp.process(srcFile, destFile);
+         } catch (JavaPpException e) {
+            destFile.delete();
+            throw new BuildException(e.toString());
          } catch (IOException e) {
             throw new BuildException(e);
          }
       } else {
          for (FileSet fs : resources) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-            File baseDir = ds.getBasedir(), src, dest, parent;
+            File baseDir = ds.getBasedir(), src, dest = null, parent;
             
             for (String file : ds.getIncludedFiles()) {
                
@@ -207,6 +210,11 @@ public class JavaPpTask extends Task {
                   }
                   
                   pp.process(src, dest);
+               } catch (JavaPpException e) {
+                  if ( dest != null )
+                     dest.delete();
+                  
+                  throw new BuildException(e.toString());
                } catch (IOException e) {
                   throw new BuildException(e);
                }

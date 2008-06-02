@@ -113,7 +113,9 @@ class PpScanner(Scanner):
     def_re = re.compile('defined\(([^\)]+)\)')
     ndef_re = re.compile('!defined\(([^\)]+)\)')
 
-    def __init__(self, file, env, prefix):
+    def __init__(self, file, filename, env, prefix):
+        pre = Str(prefix)
+        
         comp_op  = Str("==") | Str("!=") | Str(">") | Str("<") | Str(">=") | Str("<=")
         logic_op = Str("or") | Str("and")
 
@@ -140,27 +142,27 @@ class PpScanner(Scanner):
                 (ident,    PpScanner.expand_var),
                 (Str("}"), Begin(''))
             ]),
-            (Str(prefix) + Str("if"), Begin('ifcond')),
+            (pre + Str("if"), Begin('ifcond')),
             State('ifcond', [
                 (space,  IGNORE),
                 (cond,   PpScanner.if_cond),
                 (Eol,    Begin(''))
             ]),
-            (Str(prefix) + Str("elif"), Begin('elifcond')),
+            (pre + Str("elif"), Begin('elifcond')),
             State('elifcond', [
                 (space,  IGNORE),
                 (cond,   PpScanner.elif_cond),
                 (Eol,    Begin(''))
             ]),
-            (Str(prefix) + Str("else"), PpScanner.else_cond),
-            (Str(prefix) + Str("endif"), PpScanner.end_cond),
-            (Str(prefix) + Str("define"), Begin('defvar')),
+            (pre + Str("else"), PpScanner.else_cond),
+            (pre + Str("endif"), PpScanner.end_cond),
+            (pre + Str("define"), Begin('defvar')),
             State('defvar', [
                 (space, IGNORE),
                 (ident + Opt(space + Rep(AnyBut("\n"))), PpScanner.def_var),
                 (Eol,   Begin(''))
             ]),
-            (Str(prefix) + Str("undefine"), Begin('undefvar')),
+            (pre + Str("undefine"), Begin('undefvar')),
             State('undefvar', [
                 (space, IGNORE),
                 (ident, PpScanner.undef_var),
@@ -169,13 +171,13 @@ class PpScanner(Scanner):
             (AnyChar, PpScanner.output)
         ])
 
-        Scanner.__init__(self, lexicon, file)
+        Scanner.__init__(self, lexicon, file, filename)
 
         self.env = env
         self.cond_stack = stack()
 
-def process(input, output, env = {}, prefix = "#"):
-    scanner = PpScanner(input, env, prefix)
+def process(input, output, filename = "", env = {}, prefix = "#"):
+    scanner = PpScanner(input, filename, env, prefix)
     scanner.begin('')
 
     while 1:

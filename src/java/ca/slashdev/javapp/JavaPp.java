@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyException;
 import org.python.core.PyFile;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -74,7 +75,7 @@ public class JavaPp {
       py.set("prefix", prefix);
    }
    
-   public void process(File input, File output) throws IOException {
+   public void process(File input, File output) throws IOException, JavaPpException {
       FileInputStream in = null;
       FileOutputStream out = null;
       
@@ -82,10 +83,12 @@ public class JavaPp {
          in = new FileInputStream(input);
          out = new FileOutputStream(output);
          
-         py.set("infile", new PyFile(in));
+         py.set("infile", new PyFile(in, input.getName()));
          py.set("outfile", new PyFile(out));
          
-         py.exec("process(infile, outfile, env, prefix)");
+         py.exec("process(infile, outfile, infile.name, env, prefix)");
+      } catch (PyException e) {
+         throw new JavaPpException(e);
       } finally {
          if ( in != null ) in.close();
          if ( out != null ) out.close();

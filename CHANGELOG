@@ -1,5 +1,13 @@
 2008-06-02 Josh Kropf <josh.kropf@sonamobile.com>
 
+    * JavaPp.java (process): throw exception with descriptive on python error
+    * JavaPpException.java: new class, extracts message from PyException
+    * JavaPpTask.java (execute): delete file on javapp error
+    * javapp.py: set filename in scanner for more descriptive errors
+
+
+2008-06-02 Josh Kropf <josh.kropf@sonamobile.com>
+
     * version 0.3
     * JavaPpTask.java (verbose): new property, output verbose logging
       (execute): print source file name in verbose mode

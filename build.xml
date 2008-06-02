@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javapp" default="build">
-	<property name="jython.jar" location="deps/jython/jython.jar" />
-	
+    <property name="jython.jar" location="deps/jython/jython.jar" />
+    <property name="version" value="0.1" />
+
     <path id="build.classpath">
         <pathelement location="${jython.jar}" />
         <fileset dir="${ant.library.dir}" includes="*.jar" />
     </path>
-    
+
     <path id="runtime.classpath">
         <fileset file="javapp.jar" />
     </path>
-    
+
     <target name="build">
         <mkdir dir="build" />
-        
+
         <copy todir="build/Lib">
-        	<fileset dir="deps/jython/Lib" includes="*.py" />
+            <fileset dir="deps/jython/Lib" includes="*.py" />
             <fileset dir="src/python" includes="*.py" />
             <fileset dir="deps/plex" includes="Plex/*.py" />
         </copy>
-        
+
         <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
 
-    	<unjar src="${jython.jar}" dest="build" />
+        <unjar src="${jython.jar}" dest="build" />
 
         <jar destfile="javapp.jar">
             <fileset dir="build" />
@@ -35,13 +36,27 @@
         <delete dir="build" />
     </target>
 
-    <target name="run" depends="build">
+    <target name="install" depends="build">
+        <copy file="javapp.jar" todir="${ant.library.dir}" />
+    </target>
+    
+    <target name="package" depends="build">
+        <zip destfile="javapp-${version}.zip" basedir="${basedir}">
+            <include name="AUTHORS" />
+            <include name="CREDITS" />
+            <include name="COPYING" />
+            <include name="README" />
+            <include name="javapp.jar" />
+        </zip>
+    </target>
+    
+    <target name="test" depends="build">
         <taskdef resource="javapp-defs.xml" classpathref="runtime.classpath" />
         <javapp destdir="test/output">
             <fileset dir="test/input" />
-        	<property name="pee" value="poo" />
-        	<property name="num" value="2" />
+            <property name="pee" value="poo" />
+            <property name="num" value="2" />
         </javapp>
     </target>
-    
+
 </project>

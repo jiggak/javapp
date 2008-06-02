@@ -150,6 +150,13 @@ public class JavaPpTask extends Task {
       }
       
       if ( srcFile != null ) {
+         File parent = destFile.getParentFile();
+         if ( !parent.exists() ) {
+            if ( !parent.mkdirs() ) {
+               throw new BuildException("unable to create parent directory of destination file");
+            }
+         }
+         
          try {
             pp.process(srcFile, destFile);
          } catch (IOException e) {
@@ -158,11 +165,21 @@ public class JavaPpTask extends Task {
       } else {
          for (FileSet fs : resources) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-            File baseDir = ds.getBasedir();
+            File baseDir = ds.getBasedir(), src, dest, parent;
             
             for (String file : ds.getIncludedFiles()) {
                try {
-                  pp.process(new File(baseDir, file), new File(destDir, file));
+                  src = new File(baseDir, file);
+                  dest = new File(destDir, file);
+                  parent = dest.getParentFile();
+                  
+                  if ( !parent.exists() ) {
+                     if ( !parent.mkdirs() ) {
+                        throw new BuildException("unable to create parent directory of destination file");
+                     }
+                  }
+                  
+                  pp.process(src, dest);
                } catch (IOException e) {
                   throw new BuildException(e);
                }

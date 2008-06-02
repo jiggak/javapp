@@ -1,0 +1,5 @@
+2008-06-02 Josh Kropf <josh.kropf@sonamobile.com>
+
+    * version 0.2
+    * JavaPpTask.java (execute): create parent directory of destination files
+    * javapp.py: added undefine directive

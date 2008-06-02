@@ -84,6 +84,10 @@ class PpScanner(Scanner):
             self.env[tokens[0]] = ""
         return ""
 
+    def undef_var(self, text):
+        del(self.env[text])
+        return ""
+
     def expand_cond(self, text):
         text = self.var_re.sub('self.env["\\1"]', text)
         text = self.ndef_re.sub('not self.env.has_key("\\1")', text)
@@ -154,6 +158,12 @@ class PpScanner(Scanner):
             State('defvar', [
                 (space, IGNORE),
                 (ident + Opt(space + Rep(AnyBut("\n"))), PpScanner.def_var),
+                (Eol,   Begin(''))
+            ]),
+            (Str(prefix) + Str("undefine"), Begin('undefvar')),
+            State('undefvar', [
+                (space, IGNORE),
+                (ident, PpScanner.undef_var),
                 (Eol,   Begin(''))
             ]),
             (AnyChar, PpScanner.output)

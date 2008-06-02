@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javapp" default="build">
     <property name="jython.jar" location="deps/jython/jython.jar" />
-    <property name="version" value="0.1" />
+    <property name="version" value="0.2" />
 
     <path id="build.classpath">
         <pathelement location="${jython.jar}" />

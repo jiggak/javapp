@@ -87,7 +87,5 @@ Elements
  ToDo
 ================================
 On the list of things to do is:
- * friendlier error reporting
- * show line number for undefined properties
  * the #include directive
  * custom macros written in python

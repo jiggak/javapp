@@ -175,7 +175,7 @@ public class JavaPpTask extends Task {
             pp.process(srcFile, destFile);
          } catch (JavaPpException e) {
             destFile.delete();
-            throw new BuildException(e.toString());
+            throw new BuildException(e.getMessage());
          } catch (IOException e) {
             throw new BuildException(e);
          }
@@ -214,7 +214,7 @@ public class JavaPpTask extends Task {
                   if ( dest != null )
                      dest.delete();
                   
-                  throw new BuildException(e.toString());
+                  throw new BuildException(e.getMessage());
                } catch (IOException e) {
                   throw new BuildException(e);
                }

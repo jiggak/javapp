@@ -1,3 +1,10 @@
+2008-06-03 Josh Kropf <josh.kropf@sonamobile.com>
+
+    * version 0.4
+    * JavaPpTask.java (execute): use friendly message from javapp exception
+    * javapp.py: raise friendlier exception on KeyError/property undefined
+
+
 2008-06-02 Josh Kropf <josh.kropf@sonamobile.com>
 
     * JavaPp.java (process): throw exception with descriptive on python error

@@ -19,6 +19,7 @@
 #
 import re
 from StringIO import StringIO
+from exceptions import Exception
 from Plex import *
 
 class CondState:
@@ -62,11 +63,11 @@ class stack(list):
 class PpScanner(Scanner):
 
     def if_cond(self, text):
-        self.cond_stack.push(CondState(eval(self.expand_cond(text))))
+        self.cond_stack.push(CondState(self.eval_cond(text)))
         return ""
 
     def elif_cond(self, text):
-        self.cond_stack.peek().next(eval(self.expand_cond(text)))
+        self.cond_stack.peek().next(self.eval_cond(text))
         return ""
 
     def else_cond(self, text):
@@ -88,11 +89,11 @@ class PpScanner(Scanner):
         del(self.env[text])
         return ""
 
-    def expand_cond(self, text):
-        text = self.var_re.sub('self.env["\\1"]', text)
-        text = self.ndef_re.sub('not self.env.has_key("\\1")', text)
-        text = self.def_re.sub('self.env.has_key("\\1")', text)
-        return text
+    def eval_cond(self, cond):
+        cond = self.var_re.sub('self.env["\\1"]', cond)
+        cond = self.ndef_re.sub('not self.env.has_key("\\1")', cond)
+        cond = self.def_re.sub('self.env.has_key("\\1")', cond)
+        return eval(cond)
 
     def expand_var(self, text):
         if self.cond_stack.isempty():
@@ -181,7 +182,12 @@ def process(input, output, filename = "", env = {}, prefix = "#"):
     scanner.begin('')
 
     while 1:
-        token, text = scanner.read()
+        try:
+            token, text = scanner.read()
+        except KeyError, key:
+            raise Exception("'%s', line %d, char %d: property '%s' not defined"
+                             % (scanner.position() + (key,)))
+        
         if token is None:
             break
         output.write(token)
@@ -189,4 +195,3 @@ def process(input, output, filename = "", env = {}, prefix = "#"):
 #if __name__ == '__main__':
 #    import sys
 #    process(sys.stdin, sys.stdout)
-

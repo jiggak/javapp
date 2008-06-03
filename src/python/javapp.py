@@ -64,15 +64,12 @@ class PpScanner(Scanner):
 
     def if_cond(self, text):
         self.cond_stack.push(CondState(self.eval_cond(text)))
-        return ""
 
     def elif_cond(self, text):
         self.cond_stack.peek().next(self.eval_cond(text))
-        return ""
 
     def else_cond(self, text):
         self.cond_stack.peek().next(True)
-        return ""
 
     def end_cond(self, text):
         return self.output(str(self.cond_stack.pop()))
@@ -83,11 +80,9 @@ class PpScanner(Scanner):
             self.env[tokens[0]] = tokens[1]
         else:
             self.env[tokens[0]] = ""
-        return ""
 
     def undef_var(self, text):
         del(self.env[text])
-        return ""
 
     def eval_cond(self, cond):
         cond = self.var_re.sub('self.env["\\1"]', cond)
@@ -100,15 +95,12 @@ class PpScanner(Scanner):
             return str(self.env[text])
         elif self.cond_stack.peek() == True:
             return self.output(self.env[text])
-        else:
-            return ""
 
     def output(self, text):
         if self.cond_stack.isempty():
             return text
         else:
             self.cond_stack.peek().write(text)
-            return ""
 
     var_re = re.compile('\$\{([^\}]+)\}')
     def_re = re.compile('defined\(([^\)]+)\)')

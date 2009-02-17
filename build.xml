@@ -12,20 +12,35 @@
         <fileset file="javapp.jar" />
     </path>
 
+    <!--<filelist id="python_lib_files" dir="deps/jython/Lib">
+        <file name="re.py"/>
+        <file name="copy.py"/>
+        <file name="copy_reg.py"/>
+        <file name="sys.py"/>
+        <file name="sre_compile.py"/>
+        <file name="sre_constants.py"/>
+        <file name="sre_parse.py"/>
+        <file name="StringIO.py"/>
+        <file name="string.py"/>
+        <file name="types.py"/>
+    </filelist>-->
+    
     <target name="build">
         <mkdir dir="build" />
 
         <copy todir="build/Lib">
+            <!--<filelist refid="python_lib_files" />-->
             <fileset dir="deps/jython/Lib" includes="*.py" />
             <fileset dir="deps/plex" includes="Plex/*.py" />
             <fileset dir="src/python" includes="*.py" />
         </copy>
-        
+
         <copy todir="build">
             <fileset dir="deps/jython.jar" />
         </copy>
 
-        <javac srcdir="src/java" destdir="build" classpathref="build.classpath" />
+        <javac srcdir="src/java" destdir="build" source="1.5" target="1.5"
+            classpathref="build.classpath" />
         
         <jar destfile="javapp.jar">
             <fileset dir="build" />

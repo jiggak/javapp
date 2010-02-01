@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -31,21 +33,27 @@ import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFile;
 import org.python.core.PyObject;
-import org.python.util.PythonInterpreter;
+import org.python.core.PySystemState;
+import org.python.core.io.StreamIO;
 
 public class JavaPp {
-   private PythonInterpreter py;
+   private PyObject func;
+   private PyDictionary env;
+   private PyObject prefix;
    
    public JavaPp(String prefix, Hashtable<Object, Object> env) {
       Properties props = new Properties();
       props.setProperty("python.home", "javapp.jar");
       props.setProperty("python.cachedir.skip", "true");
       
-      PythonInterpreter.initialize(System.getProperties(), props, new String[] {""});
+      PySystemState.initialize(System.getProperties(), props);
       
-      py = new PythonInterpreter();
-      py.exec("from javapp import process");
-      
+	PySystemState sys = new PySystemState();
+	
+	PyObject importer = sys.getBuiltins().__getitem__(Py.newString("__import__"));
+      PyObject module = importer.__call__(Py.newString("javapp"));
+      func = module.__getattr__("process");
+	
       Hashtable<PyObject, PyObject> table = new Hashtable<PyObject, PyObject>();
       PyObject pkey, pval;
       String val;
@@ -57,36 +65,38 @@ public class JavaPp {
          
          try {
             // first attempt to parse number as integer
-            pval = Py.java2py(Integer.parseInt(val));
+            pval = Py.newInteger(Integer.parseInt(val));
          } catch (NumberFormatException ie) {
             try {
                // if not integer, try double
-               pval = Py.java2py(Double.parseDouble(val));
+               pval = Py.newFloat(Double.parseDouble(val));
             } catch (NumberFormatException de) {
-               // if neither integer or double, let jython decide
-               pval = Py.java2py(val);
+               // if neither integer or double, use string
+               pval = Py.newString(val);
             }
          }
          
          table.put(pkey, pval);
       }
       
-      py.set("env", new PyDictionary(table));
-      py.set("prefix", prefix);
+      this.env = new PyDictionary(table);
+      this.prefix = Py.newString(prefix);
    }
    
    public void process(File input, File output) throws IOException, JavaPpException {
-      FileInputStream in = null;
-      FileOutputStream out = null;
+      InputStream in = null;
+      OutputStream out = null;
       
       try {
          in = new FileInputStream(input);
          out = new FileOutputStream(output);
          
-         py.set("infile", new PyFile(in, input.getName()));
-         py.set("outfile", new PyFile(out));
+         // Plex will fail if input file is not in universal newline mode
+         PyFile infile = new PyFile(new StreamIO(in, false), input.getName(), "rU", -1);
          
-         py.exec("process(infile, outfile, infile.name, env, prefix)");
+         func.__call__(new PyObject[] {
+               infile, new PyFile(out), infile.name, env, prefix
+         });
       } catch (PyException e) {
          throw new JavaPpException(e);
       } finally {

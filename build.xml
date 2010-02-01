@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javapp" default="build">
     <property name="jython.jar" location="deps/jython/jython.jar" />
-    <property name="version" value="0.4" />
+    <property name="version" value="0.5" />
 
     <path id="build.classpath">
         <pathelement location="${jython.jar}" />
@@ -12,31 +12,43 @@
         <fileset file="javapp.jar" />
     </path>
 
-    <!--<filelist id="python_lib_files" dir="deps/jython/Lib">
-        <file name="re.py"/>
+    <filelist id="python_lib_files" dir="deps/jython/Lib">
+    	<file name="codecs.py"/>
         <file name="copy.py"/>
         <file name="copy_reg.py"/>
-        <file name="sys.py"/>
+    	<file name="encodings/__init__.py"/>
+    	<file name="encodings/ascii.py"/>
+    	<file name="encodings/utf_8.py"/>
+        <file name="re.py"/>
+    	<file name="repr.py"/>
         <file name="sre_compile.py"/>
         <file name="sre_constants.py"/>
         <file name="sre_parse.py"/>
         <file name="StringIO.py"/>
         <file name="string.py"/>
         <file name="types.py"/>
-    </filelist>-->
+    </filelist>
+
+	<fileset id="jython_files" dir="deps/jython.jar">
+        <include name="com/**" />
+		<include name="org/**" />
+    </fileset>
     
     <target name="build">
         <mkdir dir="build" />
 
         <copy todir="build/Lib">
-            <!--<filelist refid="python_lib_files" />-->
-            <fileset dir="deps/jython/Lib" includes="*.py" />
+            <filelist refid="python_lib_files" />
+        	<!--<fileset dir="deps/jython/Lib">
+            	<include name="**/*.py" />
+            	<exclude name="test/**" />
+            </fileset>-->
             <fileset dir="deps/plex" includes="Plex/*.py" />
             <fileset dir="src/python" includes="*.py" />
         </copy>
 
         <copy todir="build">
-            <fileset dir="deps/jython.jar" />
+            <fileset refid="jython_files" />
         </copy>
 
         <javac srcdir="src/java" destdir="build" source="1.5" target="1.5"
@@ -49,13 +61,13 @@
     </target>
 
     <target name="clean">
-        <delete dir="javapp.jar" />
+        <delete file="javapp.jar" />
         <delete dir="build" />
         <delete dir="test/output" />
     </target>
 
     <target name="install" depends="build">
-        <copy file="javapp.jar" todir="${ant.library.dir}" />
+        <copy file="javapp.jar" todir="${user.home}/.ant/lib" />
     </target>
     
     <target name="package" depends="build">
@@ -74,6 +86,7 @@
             <fileset dir="test/input" />
             <property name="pee" value="poo" />
             <property name="num" value="9999" />
+        	<property name="copy" value="© 2010" />
         </javapp>
     </target>
 

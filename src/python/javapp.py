@@ -182,7 +182,10 @@ def process(input, output, filename = "", env = {}, prefix = "#"):
         
         if token is None:
             break
+        
         output.write(token)
+    
+    output.flush()
 
 #if __name__ == '__main__':
 #    import sys
